@@ -54,7 +54,36 @@ function createTrack() {
 }
 createTrack();
 
+class Player {
+  constructor() {
+    const geometry = new THREE.SphereGeometry( .3, 32, 16 );
+    const material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+    const sphere = new THREE.Mesh( geometry, material );
+    sphere.position.z = 1;
+    sphere.position.x = startPosition;
+    scene.add( sphere );
+
+    this.player = sphere;
+    this.playerInfo = {
+      positionX: startPosition,
+      velocity: 0
+    }
+  }
+
+  run() {
+    this.playerInfo.velocity = .03
+  }
+
+  update() {
+    this.playerInfo.positionX -= this.playerInfo.velocity;
+    this.player.position.x = this.playerInfo.positionX;
+  }
+
+}
+
+const player = new Player();
 const soldier = new Soldier();
+
 setTimeout(() => {
   soldier.lookBackward();
 }, 1000);
@@ -62,6 +91,7 @@ setTimeout(() => {
 function animate() {
   renderer.render( scene, camera );
   requestAnimationFrame( animate );
+  player.update()
 }
 animate();
 
