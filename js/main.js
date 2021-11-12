@@ -27,6 +27,10 @@ camera.position.z = 5;
 
 const loader = new THREE.GLTFLoader();
 
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
 class Soldier {
   constructor() {
     loader.load('../models/scene.gltf', (gltf) => {
@@ -44,6 +48,14 @@ class Soldier {
 
   lookForward() {
     gsap.to(this.soldier.rotation, { y: 0, duration: .45 });
+  }
+
+  async start() {
+    this.lookBackward();
+    await delay((Math.random() * 1000) + 1000);
+    this.lookForward();
+    await delay((Math.random() * 750) + 750);
+    this.start();
   }
 }
 
@@ -74,6 +86,10 @@ class Player {
     this.playerInfo.velocity = .03
   }
 
+  stop() {
+    gsap.to(this.playerInfo, { velocity: 0, duration: .1 })
+  }
+
   update() {
     this.playerInfo.positionX -= this.playerInfo.velocity;
     this.player.position.x = this.playerInfo.positionX;
@@ -85,7 +101,7 @@ const player = new Player();
 const soldier = new Soldier();
 
 setTimeout(() => {
-  soldier.lookBackward();
+  soldier.start();
 }, 1000);
 
 function animate() {
@@ -103,3 +119,15 @@ function onWindowResize() {
 
   renderer.setSize( window.innerWidth, window.innerHeight );
 }
+
+window.addEventListener('keydown', (event) => {
+  if (event.key === 'ArrowUp') {
+    player.run();
+  }
+});
+
+window.addEventListener('keyup', (event) => {
+  if (event.key === 'ArrowUp') {
+    player.stop();
+  }
+});
