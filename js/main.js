@@ -12,6 +12,10 @@ scene.add( light );
 
 const startPosition = 3;
 const endPosition = -startPosition;
+const text = document.querySelector('.text');
+const timeLimit = 10;
+let gameState = 'loading';
+let isLookingBackward = true;
 
 function createCube(size, positionX, rotationY = 0, color = 0xfbc851) {
   const geometry = new THREE.BoxGeometry( size.w, size.h, size.d );
@@ -44,10 +48,12 @@ class Soldier {
 
   lookBackward() {
     gsap.to(this.soldier.rotation, { y: -3.15, duration: .45 });
+    setTimeout(() => isLookingBackward = true, 150)
   }
 
   lookForward() {
     gsap.to(this.soldier.rotation, { y: 0, duration: .45 });
+    setTimeout(() => isLookingBackward = false, 450)
   }
 
   async start() {
@@ -90,7 +96,19 @@ class Player {
     gsap.to(this.playerInfo, { velocity: 0, duration: .1 })
   }
 
+  check() {
+    if (this.playerInfo.velocity > 0 && !isLookingBackward) {
+      text.innerText = 'You lose!';
+      gameState = 'over';
+    }
+    if (this.playerInfo.positionX < endPosition + .4) {
+      text.innerText = 'You won!';
+      gameState = 'over';
+    }
+  }
+
   update() {
+    this.check();
     this.playerInfo.positionX -= this.playerInfo.velocity;
     this.player.position.x = this.playerInfo.positionX;
   }
@@ -100,11 +118,37 @@ class Player {
 const player = new Player();
 const soldier = new Soldier();
 
-setTimeout(() => {
+async function init() {
+  await delay(500);
+  text.innerText = 'Starting in 3';
+  await delay(500);
+  text.innerText = 'Starting in 2';
+  await delay(500);
+  text.innerText = 'Starting in 1';
+  await delay(500);
+  text.innerText = 'Goo!!!';
+  startGame();
+}
+
+function startGame() {
+  gameState = 'started';
+  const progressBar = createCube({ w: 5, h: .1, d: 1 }, 0);
+  progressBar.position.y = 3.35;
+  gsap.to(progressBar.scale, { x: 0, duration: timeLimit, ease: 'none' });
   soldier.start();
-}, 1000);
+
+  setTimeout(() => {
+    if (gameState !== 'over') {
+      text.innerText = 'You ran out of time!';
+      gameState = 'over';
+    }
+  }, timeLimit * 1000)
+}
+
+init();
 
 function animate() {
+  if (gameState === 'over') return;
   renderer.render( scene, camera );
   requestAnimationFrame( animate );
   player.update()
@@ -121,6 +165,7 @@ function onWindowResize() {
 }
 
 window.addEventListener('keydown', (event) => {
+  if (gameState !== 'started') return;
   if (event.key === 'ArrowUp') {
     player.run();
   }
