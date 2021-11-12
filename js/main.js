@@ -5,7 +5,9 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
 
-const light = new THREE.AmbientLight( 0xffffff, 0.5 );
+renderer.setClearColor( 0xb7c3f3, 1 );
+
+const light = new THREE.AmbientLight( 0xffffff, 1.2 );
 scene.add( light );
 
 // const geometry = new THREE.BoxGeometry();
@@ -16,11 +18,31 @@ scene.add( light );
 camera.position.z = 5;
 
 const loader = new THREE.GLTFLoader();
-loader.load('../models/scene.gltf', function( gltf ) {
-    scene.add( gltf.scene );
-    gltf.scene.scale.set(15, 15, 15);
+
+class Soldier {
+  constructor() {
+    loader.load('../models/scene.gltf', (gltf) => {
+        scene.add( gltf.scene );
+        gltf.scene.scale.set(20, 20, 20);
+        gltf.scene.position.set(0, -2, 0);
+        this.soldier = gltf.scene;
+      }
+    );
   }
-);
+
+  lookBackward() {
+    gsap.to(this.soldier.rotation, { y: -3.15, duration: .45 });
+  }
+
+  lookForward() {
+    gsap.to(this.soldier.rotation, { y: 0, duration: .45 });
+  }
+}
+
+const soldier = new Soldier();
+setTimeout(() => {
+  soldier.lookBackward();
+}, 1000);
 
 function animate() {
   renderer.render( scene, camera );
