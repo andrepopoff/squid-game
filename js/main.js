@@ -1,3 +1,5 @@
+import { createCube, delay } from './helpers.js';
+
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
@@ -10,30 +12,18 @@ renderer.setClearColor( 0xb7c3f3, 1 );
 const light = new THREE.AmbientLight( 0xffffff, 1.2 );
 scene.add( light );
 
-const startPosition = 3;
-const endPosition = -startPosition;
+const START_POSITION = 3;
+const END_POSITION = -START_POSITION;
+const TIME_LIMIT = 10;
+
 const text = document.querySelector('.text');
-const timeLimit = 10;
+
 let gameState = 'loading';
 let isLookingBackward = true;
-
-function createCube(size, positionX, rotationY = 0, color = 0xfbc851) {
-  const geometry = new THREE.BoxGeometry( size.w, size.h, size.d );
-  const material = new THREE.MeshBasicMaterial( { color } );
-  const cube = new THREE.Mesh( geometry, material );
-  cube.position.x = positionX;
-  cube.rotation.y = rotationY;
-  scene.add( cube );
-  return cube;
-}
 
 camera.position.z = 5;
 
 const loader = new THREE.GLTFLoader();
-
-function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms))
-}
 
 class Soldier {
   constructor() {
@@ -66,9 +56,9 @@ class Soldier {
 }
 
 function createTrack() {
-  createCube({ w: startPosition * 2 + .2, h: 1.5, d: 1 }, 0, 0, 0xe5a716).position.z = -1;
-  createCube({ w: .2, h: 1.5, d: 1 }, startPosition, -.35);
-  createCube({ w: .2, h: 1.5, d: 1 }, endPosition, .35);
+  createCube(scene, { w: START_POSITION * 2 + .2, h: 1.5, d: 1 }, 0, 0, 0xe5a716).position.z = -1;
+  createCube(scene,{ w: .2, h: 1.5, d: 1 }, START_POSITION, -.35);
+  createCube(scene,{ w: .2, h: 1.5, d: 1 }, END_POSITION, .35);
 }
 createTrack();
 
@@ -78,12 +68,12 @@ class Player {
     const material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
     const sphere = new THREE.Mesh( geometry, material );
     sphere.position.z = 1;
-    sphere.position.x = startPosition;
+    sphere.position.x = START_POSITION;
     scene.add( sphere );
 
     this.player = sphere;
     this.playerInfo = {
-      positionX: startPosition,
+      positionX: START_POSITION,
       velocity: 0
     }
   }
@@ -101,7 +91,7 @@ class Player {
       text.innerText = 'You lose!';
       gameState = 'over';
     }
-    if (this.playerInfo.positionX < endPosition + .4) {
+    if (this.playerInfo.positionX < END_POSITION + .4) {
       text.innerText = 'You won!';
       gameState = 'over';
     }
@@ -132,9 +122,9 @@ async function init() {
 
 function startGame() {
   gameState = 'started';
-  const progressBar = createCube({ w: 5, h: .1, d: 1 }, 0);
+  const progressBar = createCube(scene,{ w: 5, h: .1, d: 1 }, 0);
   progressBar.position.y = 3.35;
-  gsap.to(progressBar.scale, { x: 0, duration: timeLimit, ease: 'none' });
+  gsap.to(progressBar.scale, { x: 0, duration: TIME_LIMIT, ease: 'none' });
   soldier.start();
 
   setTimeout(() => {
@@ -142,7 +132,7 @@ function startGame() {
       text.innerText = 'You ran out of time!';
       gameState = 'over';
     }
-  }, timeLimit * 1000)
+  }, TIME_LIMIT * 1000)
 }
 
 init();
