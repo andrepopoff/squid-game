@@ -1,4 +1,5 @@
 import { createCube, delay } from './helpers.js';
+import { Soldier } from './characters.js';
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
@@ -19,41 +20,10 @@ const TIME_LIMIT = 10;
 const text = document.querySelector('.text');
 
 let gameState = 'loading';
-let isLookingBackward = true;
 
 camera.position.z = 5;
 
 const loader = new THREE.GLTFLoader();
-
-class Soldier {
-  constructor() {
-    loader.load('../models/scene.gltf', (gltf) => {
-        scene.add( gltf.scene );
-        gltf.scene.scale.set(20, 20, 20);
-        gltf.scene.position.set(0, -2, 0);
-        this.soldier = gltf.scene;
-      }
-    );
-  }
-
-  lookBackward() {
-    gsap.to(this.soldier.rotation, { y: -3.15, duration: .45 });
-    setTimeout(() => isLookingBackward = true, 150)
-  }
-
-  lookForward() {
-    gsap.to(this.soldier.rotation, { y: 0, duration: .45 });
-    setTimeout(() => isLookingBackward = false, 450)
-  }
-
-  async start() {
-    this.lookBackward();
-    await delay((Math.random() * 1000) + 1000);
-    this.lookForward();
-    await delay((Math.random() * 750) + 750);
-    this.start();
-  }
-}
 
 function createTrack() {
   createCube(scene, { w: START_POSITION * 2 + .2, h: 1.5, d: 1 }, 0, 0, 0xe5a716).position.z = -1;
@@ -63,7 +33,8 @@ function createTrack() {
 createTrack();
 
 class Player {
-  constructor() {
+  constructor(character) {
+    this.character = character;
     const geometry = new THREE.SphereGeometry( .3, 32, 16 );
     const material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
     const sphere = new THREE.Mesh( geometry, material );
@@ -87,7 +58,7 @@ class Player {
   }
 
   check() {
-    if (this.playerInfo.velocity > 0 && !isLookingBackward) {
+    if (this.playerInfo.velocity > 0 && !this.character.isLookingBackward) {
       text.innerText = 'You lose!';
       gameState = 'over';
     }
@@ -105,8 +76,8 @@ class Player {
 
 }
 
-const player = new Player();
-const soldier = new Soldier();
+const soldier = new Soldier(loader, scene);
+const player = new Player(soldier);
 
 async function init() {
   await delay(500);
