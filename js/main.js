@@ -2,6 +2,7 @@ import { createCube, delay } from './helpers.js';
 import { Soldier } from './characters.js';
 import { Player } from './player.js';
 import { Sphere } from './sphere.js';
+import { Track } from './track.js';
 
 const START_POSITION = 3;
 const END_POSITION = -START_POSITION;
@@ -23,13 +24,7 @@ scene.add( light );
 
 camera.position.z = 5;
 
-function createTrack() {
-  createCube(scene, { w: START_POSITION * 2 + .2, h: 1.5, d: 1 }, 0, 0, 0xe5a716).position.z = -1;
-  createCube(scene,{ w: .2, h: 1.5, d: 1 }, START_POSITION, -.35);
-  createCube(scene,{ w: .2, h: 1.5, d: 1 }, END_POSITION, .35);
-}
-createTrack();
-
+new Track(scene, START_POSITION, END_POSITION).create();
 const soldier = new Soldier(loader, scene);
 const sphere = new Sphere(scene, START_POSITION).obj;
 const player = new Player(soldier, sphere);
