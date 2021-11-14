@@ -3,6 +3,7 @@ import { Soldier } from './characters.js';
 import { Player } from './player.js';
 import { Sphere } from './sphere.js';
 import { Track } from './track.js';
+import { Listener } from './listener.js';
 
 const START_POSITION = 3;
 const END_POSITION = -START_POSITION;
@@ -67,24 +68,5 @@ function animate() {
 }
 animate();
 
-window.addEventListener( 'resize', onWindowResize, false );
-
-function onWindowResize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-
-  renderer.setSize( window.innerWidth, window.innerHeight );
-}
-
-window.addEventListener('keydown', (event) => {
-  if (player.gameState !== 'started') return;
-  if (event.key === 'ArrowUp') {
-    player.run();
-  }
-});
-
-window.addEventListener('keyup', (event) => {
-  if (event.key === 'ArrowUp') {
-    player.stop();
-  }
-});
+const listener = new Listener(camera, renderer, player);
+listener.keyDown().keyUp().resize();
