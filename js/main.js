@@ -18,11 +18,8 @@ const text = document.querySelector('.text');
 
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
-
 renderer.setClearColor( 0xb7c3f3, 1 );
-
 scene.add( light );
-
 camera.position.z = 5;
 
 new Track(scene, START_POSITION, END_POSITION).create();
@@ -58,15 +55,13 @@ function startGame() {
   }, TIME_LIMIT * 1000)
 }
 
-init();
-
 function animate() {
   if (player.gameState === 'over') return;
   renderer.render( scene, camera );
   requestAnimationFrame( animate );
   player.update(END_POSITION);
 }
-animate();
 
-const listener = new Listener(camera, renderer, player);
-listener.keyDown().keyUp().resize();
+init();
+animate();
+new Listener(camera, renderer, player).keyDown().keyUp().resize();
