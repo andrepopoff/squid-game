@@ -13,3 +13,14 @@
     text-shadow: 0 2px 5px rgba(0, 0, 0, .3);
     transform: translateX(-50%);
 }
+
+.restart-btn {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 40px;
+    font-size: 30px;
+    padding: 10px 30px;
+    background-color: lightgreen;
+    cursor: pointer;
+}
